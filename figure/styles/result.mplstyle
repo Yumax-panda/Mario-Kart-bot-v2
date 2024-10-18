@@ -1,0 +1,8 @@
+grid.color: gray
+grid.linestyle: :
+
+legend.borderaxespad: 0.5
+legend.loc: upper left
+
+lines.color: green
+lines.linewidth: 1
