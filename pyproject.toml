@@ -1,0 +1,55 @@
+[tool.poetry]
+name = "mkbot"
+version = "0.1.0"
+description = "A discord bot for Mario Kart 8 Deluxe"
+authors = ["Yumax-panda"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiohttp = "3.8.6"
+firebase-admin = "^6.4.0"
+pillow = "^10.2.0"
+matplotlib = "^3.8.2"
+numpy = "^1.26.4"
+pandas = "^2.2.0"
+dependency-injector = "^4.41.0"
+py-cord = "^2.5.0"
+aiomysql = "^0.2.0"
+sqlalchemy = "^2.0.35"
+greenlet = "^3.1.1"
+
+
+[tool.poetry.group.dev.dependencies]
+python-dotenv = "^1.0.1"
+flake8 = "^7.0.0"
+black = "^24.2.0"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+pytest = "^8.1.1"
+taskipy = "^1.12.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 125
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+combine_star = true
+line_length = 125
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.taskipy.tasks]
+test = "pytest"
+fmt = "black . && isort ."
+lint = "mypy ."
+start = "python3 bot.py"
+export-requirements = "poetry export -f requirements.txt -o requirements.txt --without-hashes"
+export-with-dev = "poetry export -f requirements.txt -o requirements.txt --without-hashes --with dev"
