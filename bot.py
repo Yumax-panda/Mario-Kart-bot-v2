@@ -137,6 +137,7 @@ class Container(containers.DeclarativeContainer):
         host_name=config.db_hostname,
         port=config.db_port,
         db_name=config.db_name,
+        ssl_ca_path=config.ssl_ca_path,
     )
     srv = providers.Singleton(Service, firebase_key=config.firebase_key, firebase_url=config.firebase_url)
 
@@ -171,6 +172,7 @@ if __name__ == "__main__":
     container.config.db_hostname.from_env("DB_HOSTNAME", default="localhost")
     container.config.db_port.from_env("DB_PORT", as_=int, default=3306)
     container.config.db_name.from_env("DB_NAME", default="mkbot")
+    container.config.ssl_ca_path.from_env("SSL_CA_PATH", default=None)
     container.config.firebase_key.from_env("FIREBASE_KEY", required=True)
     container.config.firebase_url.from_env("FIREBASE_URL", default="https://mariokart-c27da-default-rtdb.firebaseio.com/")
     container.config.webhook_url.from_env("WEBHOOK_URL", required=True)

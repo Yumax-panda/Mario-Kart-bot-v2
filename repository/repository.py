@@ -5,9 +5,7 @@ from typing import TYPE_CHECKING, Iterable, TypeVar
 
 from sqlalchemy import and_, delete, desc, select
 from sqlalchemy.dialects.mysql import insert
-from sqlalchemy.ext.asyncio import create_async_engine
 
-from model.core import metadata
 from model.gathers import gathers
 from model.guilds import guilds
 from model.nso_tokens import nso_tokens
@@ -39,14 +37,6 @@ class Repository(IRepository):
 
     def __init__(self, engine: AsyncEngine) -> None:
         self.engine = engine
-
-    @classmethod
-    async def setup(cls: type[RepoT], url: str) -> RepoT:
-        engine = create_async_engine(url)
-        async with engine.begin() as conn:
-            await conn.run_sync(metadata.create_all)
-
-        return cls(engine=engine)
 
     # GatherRepository implementation
     async def insert_gathers(
