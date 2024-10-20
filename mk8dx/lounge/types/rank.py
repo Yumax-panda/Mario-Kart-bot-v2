@@ -2,9 +2,14 @@ from typing import Literal, TypedDict
 
 from typing_extensions import NotRequired
 
-__all__ = ("Division", "Rank")
+__all__ = (
+    "WellKnownDivision",
+    "UnknownDivision",
+    "Division",
+    "Rank",
+)
 
-Division = Literal[
+WellKnownDivision = Literal[
     "Grandmaster",
     "Master",
     "Diamond",
@@ -15,9 +20,11 @@ Division = Literal[
     "Silver",
     "Bronze",
     "Iron",
-    "Placement",
-    "Unknown",
 ]
+
+UnknownDivision = Literal["Placement", "Unknown"]
+
+Division = Literal[WellKnownDivision, UnknownDivision]
 
 
 class Rank(TypedDict):
