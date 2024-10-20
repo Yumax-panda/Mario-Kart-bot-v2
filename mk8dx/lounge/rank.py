@@ -6,13 +6,14 @@ from discord import Color, Embed
 
 from utils.constants import CURRENT_SEASON, Season
 
+from .errors import PlacementPlayer, UnknownPlayer
 from .types.rank import Rank as RankPayload
 from .utils import BaseModel
 
 __all__ = ("Rank",)
 
 if TYPE_CHECKING:
-    from .types.rank import Division
+    from .types.rank import Division, UnknownDivision, WellKnownDivision
 
 RT = TypeVar("RT", bound="Rank")
 
@@ -214,9 +215,22 @@ def get_rank_data(division: "Division") -> RankDataItem:
     -------
     RankDataItem
         Divisionに対応するデータ
+
+    Raises
+    ------
+    PlacementPlayer
+        Divisionが"Placement"の場合
+    UnknownPlayer
+        Divisionが"Unknown"の場合
     """
+    if division == "Placement":
+        raise PlacementPlayer
+
+    if division == "Unknown":
+        raise UnknownPlayer
+
     # これは冗長に見えるが, 変数が予期しないタイミングで変更されることを防いでいる.
-    data: dict[Division, RankDataItem] = {
+    data: dict[WellKnownDivision, RankDataItem] = {
         "Grandmaster": {"color": 0xA3022C, "url": "https://i.imgur.com/EWXzu2U.png"},
         "Master": {"color": 0xD9E1F2, "url": "https://i.imgur.com/3yBab63.png"},
         "Diamond": {"color": 0xBDD7EE, "url": "https://i.imgur.com/RDlvdvA.png"},
