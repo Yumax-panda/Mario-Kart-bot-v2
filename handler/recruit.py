@@ -247,14 +247,13 @@ class RecruitHandler(IBaseHandler, IRecruitHandler):
             "embed": embed,
         }
 
-        # 6人以上そろっている時間がある場合, メンバーへメンションする.
-
         filled: list[int] = []
 
         for hour in sorted(synced.keys()):
             is_filled = len(synced[hour].get("c", [])) >= 6
 
-            if is_filled:
+            # 挙手した時間で6人以上そろっている時間がある場合, メンバーへメンションする.
+            if is_filled and hour in hours:
                 filled.append(hour)
 
         if filled:
