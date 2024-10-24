@@ -6,7 +6,7 @@ from discord import ApplicationContext, Member, OptionChoice, Role, option, slas
 from discord.ext import commands
 
 from .core import Cog
-from .middlewares import guild_only, is_ignored_channel
+from .middlewares import RateLimit, guild_only, is_ignored_channel
 
 if TYPE_CHECKING:
     from bot import Bot
@@ -26,6 +26,8 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
                 "en-US": "Match related",
             },
         )
+
+    r = RateLimit(get_key=lambda c: c.guild.id, max_concurrency=1)
 
     def cog_check(self, ctx: HybridContext) -> bool:
         # NOTE: テキストコマンドではguild_only属性がないため, ここでバリデーションする必要がある.
@@ -77,6 +79,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         },
         default=None,
     )
+    @r.limited
     async def can(self, ctx: ApplicationContext, hours: str, type: str, member: Member | None) -> None:
         members = [member or ctx.author]
         handler_map = {
@@ -95,6 +98,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!c [@members] <hours>",
         hidden=False,
     )
+    @r.limited
     async def text_can(
         self,
         ctx: commands.Context,
@@ -112,6 +116,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!t [@members] <hours>",
         hidden=False,
     )
+    @r.limited
     async def text_tentative(
         self,
         ctx: commands.Context,
@@ -129,6 +134,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!s [@members] <hours>",
         hidden=False,
     )
+    @r.limited
     async def text_substitute(
         self,
         ctx: commands.Context,
@@ -166,6 +172,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         },
         default=None,
     )
+    @r.limited
     async def drop(self, ctx: ApplicationContext, hours: str, member: Member | None) -> None:
         members = [member or ctx.author]
         return await self.h.drop(ctx, members, hours)
@@ -178,6 +185,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!d [@members] <hours>",
         hidden=False,
     )
+    @r.limited
     async def text_drop(
         self,
         ctx: commands.Context,
@@ -192,6 +200,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         description="Cancel all participation",
         description_localizations={"ja": "挙手を全て取り下げる"},
     )
+    @r.limited
     async def clear(self, ctx: ApplicationContext) -> None:
         return await self.h.clear(ctx)
 
@@ -202,6 +211,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!clear",
         hidden=False,
     )
+    @r.limited
     async def text_clear(self, ctx: commands.Context) -> None:
         return await self.h.clear(ctx)
 
@@ -221,6 +231,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
             "ja": "挙手を取り下げる時間",
         },
     )
+    @r.limited
     async def out(self, ctx: ApplicationContext, hours: str) -> None:
         return await self.h.out(ctx, hours)
 
@@ -231,6 +242,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!out <hours>",
         hidden=False,
     )
+    @r.limited
     async def text_out(self, ctx: commands.Context, hours: str) -> None:
         return await self.h.out(ctx, hours)
 
@@ -239,6 +251,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         description="Show current participation status",
         description_localizations={"ja": "現在の挙手状況を表示する"},
     )
+    @r.limited
     async def now(self, ctx: ApplicationContext) -> None:
         return await self.h.now(ctx)
 
@@ -250,6 +263,7 @@ class RecruitCog(Cog, name="Match", command_attrs=dict(guild_only=True)):
         usage="!now",
         hidden=False,
     )
+    @r.limited
     async def text_now(self, ctx: commands.Context) -> None:
         return await self.h.now(ctx)
 
