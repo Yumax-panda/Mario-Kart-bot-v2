@@ -31,6 +31,7 @@ class BookmarkView(View):
 
     def __init__(self, players: list[PinnedPlayer] = []) -> None:
         """ブックマークされたプレイヤーのStatsを表示するView.
+        コマンドで呼び出してこのViewを表示する際は, playersが空でないことを保証すること.
 
         Parameters
         ----------
@@ -39,15 +40,12 @@ class BookmarkView(View):
         """
         super().__init__()
 
-        if not players:
-            self.remove_item(self.change_player)  # type: ignore
-        else:
-            options: list[SelectOption] = []
+        options: list[SelectOption] = []
 
-            for player in players[:MAX_SELECT_OPTIONS]:
-                options.append(SelectOption(label=player.nick_name, value=player.repr))
+        for player in players[:MAX_SELECT_OPTIONS]:
+            options.append(SelectOption(label=player.nick_name, value=player.repr))
 
-            self.change_player.options = options  # type: ignore
+        self.change_player.options = options  # type: ignore
 
         self.add_item(DeleteButton(label="終了", custom_id="stats_exit"))
 
