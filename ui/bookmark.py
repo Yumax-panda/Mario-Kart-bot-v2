@@ -181,4 +181,11 @@ class BookmarkRemoveView(View):
 
         deleted_name = player.nick_name
 
+        if (message := interaction.message) is not None:
+            try:
+                self.disable_all_items()
+                await message.edit(view=self)
+            except:
+                pass
+
         await interaction.respond(f"{deleted_name}を削除しました.", ephemeral=True)
