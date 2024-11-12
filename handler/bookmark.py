@@ -13,7 +13,6 @@ from .types import BaseHandler as IBaseHandler, BookmarkHandler as IBookmarkHand
 __all__ = ("BookmarkHandler",)
 
 if TYPE_CHECKING:
-    from discord import ApplicationContext
     from discord.ui import View
 
     from utils.types import HybridContext

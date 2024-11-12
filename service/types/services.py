@@ -1,7 +1,7 @@
-from . import FirebaseService, NintendoSwitchOnlineService
+from . import NintendoSwitchOnlineService
 
 __all__ = ("Service",)
 
 
-class Service(FirebaseService, NintendoSwitchOnlineService):
+class Service(NintendoSwitchOnlineService):
     pass
