@@ -33,6 +33,9 @@ class NintendoSwitchOnlineService(INintendoSwitchOnlineService):
 
     __new_version_cache: Version
 
+    def __init__(self):
+        pass
+
     @property
     def nso_product_version(self) -> str:
         if hasattr(self, "__new_version_cache"):
