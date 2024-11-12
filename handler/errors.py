@@ -7,6 +7,7 @@ from utils.errors import BotError
 
 __all__ = (
     "BookmarkLimitExceeded",
+    "BotMissingPermissions",
     "EnemyNameNotFound",
     "FailedToGetBotData",
     "FailedToGetMemberData",
@@ -60,6 +61,13 @@ BookmarkLimitExceeded = BotError(
     {
         "ja": f"ブックマークは{MAX_SELECT_OPTIONS}個までしか登録できません",
         "en-US": f"You can only bookmark up to {MAX_SELECT_OPTIONS} players",
+    }
+)
+
+BotMissingPermissions = BotError(
+    {
+        "ja": "実行するのに必要な権限がBotにありません. 再度サーバーに導入するかBotに付与されているロールの権限をご確認ください.",
+        "en-US": "Bot does not have the necessary permissions to run. Please re-install the bot on the server or check the permissions of the roles granted to the bot.",
     }
 )
 

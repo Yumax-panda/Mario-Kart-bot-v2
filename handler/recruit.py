@@ -3,9 +3,22 @@ from __future__ import annotations
 import asyncio
 import random
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Coroutine, Final, Iterable, Sequence, TypedDict
+from functools import wraps
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Final,
+    Iterable,
+    ParamSpec,
+    Sequence,
+    TypedDict,
+    TypeVar,
+)
 
-from discord import ApplicationContext, Embed, Member, Role
+from discord import ApplicationContext, Embed, Forbidden, Member, Role
 from discord.utils import get
 
 from utils.constants import MAX_EMBED_FIELDS, MAX_ROLES, EmbedColor
@@ -13,6 +26,7 @@ from utils.format import user_mention
 from utils.parser import get_hours as _get_hours
 
 from .errors import (
+    BotMissingPermissions,
     FailedToGetBotData,
     FailedToGetMemberData,
     GuildNotFound,
@@ -48,6 +62,8 @@ else:
     ParticipatePayload = dict
     GatherData = dict
 
+P = ParamSpec("P")
+T = TypeVar("T")
 
 EMBED_TITLE: Final[str] = "**6v6 War List**"
 ARCHIVE: Final[str] = "Archive"
@@ -345,6 +361,36 @@ def get_hours(text: str) -> list[int]:
     return hours
 
 
+def maybe_forbidden(func: Callable[P, Awaitable[T]]) -> Callable[P, Awaitable[T]]:
+    """権限に関するエラーでタスクが失敗したときのエラーメッセージを送るためのデコレータ.
+
+    Parameters
+    ----------
+    func : Callable[P, Awaitable[T]]
+        discordサーバーの権限に関するエラーによって失敗しうるコルーチン.
+
+    Returns
+    -------
+    Callable[P, Awaitable[T]]
+        ラップされた関数.
+
+    Raises
+    ------
+    BotError
+        `discord.Forbidden`が発生したとき。
+    """
+
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        try:
+            return await func(*args, **kwargs)
+        except Forbidden as e:
+            raise BotMissingPermissions from e
+
+    return wrapper
+
+
+@maybe_forbidden
 async def add_roles(guild: Guild, member: Iterable[Member], hours: Iterable[int]) -> None:
     """指定した時間の役職を付与する.
 
@@ -377,6 +423,7 @@ async def add_roles(guild: Guild, member: Iterable[Member], hours: Iterable[int]
     await asyncio.gather(*add_role_tasks)
 
 
+@maybe_forbidden
 async def remove_roles(guild: Guild, member: Iterable[Member], hours: Iterable[int]) -> None:
     """指定した時間の役職を剥奪する.
 
@@ -398,6 +445,7 @@ async def remove_roles(guild: Guild, member: Iterable[Member], hours: Iterable[i
     await asyncio.gather(*remove_role_tasks)
 
 
+@maybe_forbidden
 async def delete_roles(guild: Guild, hours: Iterable[int]) -> None:
     """指定した時間の役職を削除する.
 
