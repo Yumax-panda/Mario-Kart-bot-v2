@@ -6,7 +6,6 @@ from .admin import AdminHandler
 from .bookmark import BookmarkHandler
 from .core import BaseHandler
 from .friend import FriendHandler
-from .game import GameHandler
 from .recruit import RecruitHandler
 from .result import ResultHandler
 from .team import TeamHandler
@@ -27,7 +26,6 @@ class Handler(
     AdminHandler,
     BookmarkHandler,
     FriendHandler,
-    GameHandler,
     RecruitHandler,
     ResultHandler,
     TeamHandler,

@@ -112,8 +112,6 @@ class Bot(commands.AutoShardedBot):
             "cog.admin",
             "cog.bookmark",
             "cog.friend",
-            # TODO: implement GameCog
-            # "cog.game",
             "cog.recruit",
             "cog.result",
             "cog.team",
