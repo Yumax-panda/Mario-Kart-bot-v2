@@ -9,17 +9,11 @@ from dependency_injector.wiring import Provide, inject
 from discord import Activity, ActivityType, Intents, Status
 from discord.ext import commands
 
-from ui.bookmark import BookmarkView
-
-try:
-    import _config
-except ImportError:
-    pass
-
 from handler import Handler
 from mk8dx import LoungeClient
 from repository import Config
 from service import Service
+from ui.bookmark import BookmarkView
 
 fmt = "%(asctime)s:%(levelname)s:%(name)s: %(message)s"
 logging.basicConfig(level=logging.INFO, format=fmt, handlers=[logging.StreamHandler()])
