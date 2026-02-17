@@ -26,6 +26,11 @@ if TYPE_CHECKING:
 
     from handler.types.handler import Handler as IHandler
 
+try:
+    import _config
+except ImportError:
+    pass
+
 
 class Bot(commands.AutoShardedBot):
 
