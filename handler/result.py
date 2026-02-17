@@ -328,7 +328,13 @@ class ResultHandler(IBaseHandler, IResultHandler):
         await file.save(buffer)
 
         try:
-            df = pd.read_csv(buffer, skipinitialspace=True, header=None).loc[:, [1, 2, 3, 4]]
+            df = pd.read_csv(
+                buffer,
+                skipinitialspace=True,
+                header=None,
+                dtype={0: str, 1: int, 2: int, 3: str},
+                keep_default_na=False,  # 例えば、チーム名が"null"のような場合にNaNとしてパースしないようにする
+            ).loc[:, [1, 2, 3, 4]]
             df.columns = ["score", "enemyScore", "enemy", "date"]
             df = df.copy()
             df["date"] = pd.to_datetime(df["date"])
