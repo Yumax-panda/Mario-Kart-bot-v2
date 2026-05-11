@@ -6,6 +6,6 @@ __all__ = (
     "Season",
 )
 
-Season = Literal[4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+Season = Literal[4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 MIN_SEASON: Final[int] = 4
-CURRENT_SEASON: Final[int] = 13
+CURRENT_SEASON: Final[int] = 15
