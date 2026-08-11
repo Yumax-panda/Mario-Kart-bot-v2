@@ -10,5 +10,7 @@
     "mypy.dmypyExecutable": "${workspaceFolder}/.venv/bin/dmypy",
     "editor.tabSize": 4,
     "mypy.enabled": true,
-    "autoDocstring.docstringFormat": "numpy"
+    "autoDocstring.docstringFormat": "numpy",
+    "python-envs.defaultEnvManager": "ms-python.python:poetry",
+    "python-envs.defaultPackageManager": "ms-python.python:poetry"
 }
