@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+import logging
 import ssl
 from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import create_async_engine
-
-from model.core import metadata
 
 from .repository import Repository
 
@@ -54,9 +53,9 @@ class Config:
         )
 
     async def get_repository(self) -> Repository:
-        engine = self.create_engine()
+        repo = Repository(self.create_engine())
 
-        async with engine.begin() as conn:
-            await conn.run_sync(metadata.create_all)
+        if await repo.migrate():
+            logging.info("Database schema was freshly initialized.")
 
-        return Repository(engine)
+        return repo
