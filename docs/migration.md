@@ -7,7 +7,7 @@
 - `alembic.ini` : Alembic本体の設定。接続情報はここには書かず、`migrations/env.py` が環境変数から組み立てる。
 - `migrations/env.py` : マイグレーションの実行環境。`model/` 配下の全モジュールを読み込み、`metadata` に登録されたテーブルを比較対象にする。
   - Botの起動時は、`Repository.migrate()` から渡された接続を使う。
-  - CLIの実行時は、`DB_*` 環境変数から `Config.create_engine()` でエンジンを作成する。
+  - CLIの実行時は、`-x db_url=...`、なければ `DB_*` 環境変数から `Config.create_engine()` でエンジンを作成する。
 - `migrations/versions/` : リビジョンファイル。
 
 ## コマンド
@@ -27,6 +27,13 @@
 
 ```bash
 DB_HOSTNAME=example.com DB_PORT=4000 DB_NAME=mkbot poetry run task migrate-check
+```
+
+`stamp` と `check` は接続URLでも指定できる。パスワードの記号はパーセントエンコードする。TLSが必要なDBでは、クエリの `ssl_ca` にCA証明書のパスを指定する。省略すると `SSL_CA_PATH` を参照する。
+
+```bash
+make stamp url="mysql://user:pass@example.com:4000/mkbot?ssl_ca=/etc/ssl/cert.pem"
+make check url="mysql://user:pass@example.com:4000/mkbot?ssl_ca=/etc/ssl/cert.pem"
 ```
 
 ## 運用

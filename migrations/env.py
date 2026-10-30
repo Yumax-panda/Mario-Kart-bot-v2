@@ -3,6 +3,7 @@ import importlib
 import os
 import pkgutil
 from logging.config import fileConfig
+from urllib.parse import parse_qs, urlsplit
 
 from alembic import context
 from sqlalchemy.engine import Connection
@@ -28,7 +29,22 @@ target_metadata = metadata
 
 
 def _build_config() -> Config:
-    """DB_*環境変数から接続設定を作成する."""
+    """`-x db_url=...`, なければDB_*環境変数から接続設定を作成する."""
+    db_url = context.get_x_argument(as_dictionary=True).get("db_url")
+
+    if db_url:
+        url = urlsplit(db_url)
+        ssl_ca = parse_qs(url.query).get("ssl_ca", [None])[0]
+        # Config.dsnはURLへそのまま埋め込むので, パーセントエンコードは解除しない.
+        return Config(
+            user=url.username or "",
+            password=url.password or "",
+            host_name=url.hostname or "",
+            port=url.port or 3306,
+            db_name=url.path.lstrip("/"),
+            ssl_ca_path=ssl_ca or os.environ.get("SSL_CA_PATH") or None,
+        )
+
     return Config(
         user=os.environ.get("DB_USERNAME", "root"),
         password=os.environ.get("DB_PASSWORD", "password"),
