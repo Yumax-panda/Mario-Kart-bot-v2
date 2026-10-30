@@ -14,7 +14,6 @@ from .utility import UtilityHandler
 if TYPE_CHECKING:
     from mk8dx.lounge.types.client import LoungeClient as ILoungeClient
     from repository.config import Config
-    from service.types.services import Service as IService
 
 
 __all__ = ("Handler",)
@@ -30,9 +29,8 @@ class Handler(
     TeamHandler,
     UtilityHandler,
 ):
-    def __init__(self, config: Config, webhook_token: str, lc: ILoungeClient, srv: IService) -> None:
+    def __init__(self, config: Config, webhook_token: str, lc: ILoungeClient) -> None:
         # RepositoryはBotの起動後にセットアップする.
         self._webhook_token = webhook_token
         self.config = config
         self.lc = lc
-        self.srv = srv

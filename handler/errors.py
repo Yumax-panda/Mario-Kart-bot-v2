@@ -16,7 +16,6 @@ __all__ = (
     "InvalidDatetimeInput",
     "InvalidGameMessage",
     "InvalidScoreInput",
-    "LoginRequired",
     "NoBookmarkRegistered",
     "NoFriendCodeFound",
     "NoMembersAvailable",
@@ -118,13 +117,6 @@ InvalidScoreInput = BotError(
     {
         "ja": "<自チームの得点> <相手チームの得点: 省略可能> の形式で入力してください. 例: `10 5`",
         "en-US": "Please enter in the format of <your team's score> <opponent team's score: optional>. Example: `10 5`",
-    }
-)
-
-LoginRequired = BotError(
-    {
-        "ja": "Nintendo Switch Onlineのログインが必要です. `/friend setup`を実行してください.",
-        "en-US": "Nintendo Switch Online login is required. Please run `/friend setup`.",
     }
 )
 

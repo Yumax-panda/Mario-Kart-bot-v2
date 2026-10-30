@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import TYPE_CHECKING, Iterable, TypeVar
 
 from sqlalchemy import and_, delete, desc, select
@@ -8,11 +8,8 @@ from sqlalchemy.dialects.mysql import insert
 
 from model.gathers import gathers
 from model.guilds import guilds
-from model.nso_tokens import nso_tokens
 from model.pinned_players import PinnedPlayer, pinned_players
-from model.requests import requests
 from model.results import results as results_table
-from model.session_tokens import session_tokens
 from model.users import users
 
 from .types.repository import Repository as IRepository
@@ -23,7 +20,6 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncEngine
 
     from model.gathers import GatherItem, ParticipationType
-    from model.requests import RequestPayload
     from model.results import ResultItemWithID, Results
 
 
@@ -138,46 +134,6 @@ class Repository(IRepository):
         (team_name,) = data
         return team_name
 
-    # NSOTokenRepository implementation
-    async def put_nso_token(self, user_id: int, nso_token: str, expires_in: int) -> None:
-        async with self.engine.begin() as conn:
-            now = datetime.now()
-            expires_at = now + timedelta(seconds=expires_in)
-
-            query = (
-                insert(nso_tokens)
-                .values(
-                    user_id=user_id,
-                    token=nso_token,
-                    expires_at=expires_at,
-                )
-                .on_duplicate_key_update(
-                    token=nso_token,
-                    expires_at=expires_at,
-                )
-            )
-
-            await conn.execute(query)
-
-    async def get_nso_token(self, user_id: int) -> str | None:
-        async with self.engine.begin() as conn:
-            now = datetime.now()
-            query = select(nso_tokens.c.token).where(
-                and_(
-                    nso_tokens.c.user_id == user_id,
-                    nso_tokens.c.expires_at > now,
-                ),
-            )
-
-            result = await conn.execute(query)
-            data = result.fetchone()
-
-        if data is None:
-            return None
-
-        (nso_token,) = data
-        return nso_token
-
     # PinnedPlayerRepository implementation
     async def put_pinned_player(self, user_id: int, player_id: int, nick_name: str) -> None:
         async with self.engine.connect() as conn:
@@ -226,50 +182,6 @@ class Repository(IRepository):
                 )
                 for (player_id, player_display_name) in records
             ]
-
-    # RequestRepository implementation
-    async def put_requests(self, user_id: int, data: RequestPayload) -> None:
-        try:
-            await self._delete_all_requests(user_id=user_id)
-        except:
-            pass
-
-        async with self.engine.begin() as conn:
-            values = [
-                {
-                    "user_id": user_id,
-                    "target_user_name": d["name"],
-                    "target_user_switch_fc": d["fc"],
-                    "target_user_nsa_id": d["nsa_id"],
-                }
-                for d in data
-            ]
-            await conn.execute(requests.insert(), values)
-
-    async def _delete_all_requests(self, user_id: int) -> None:
-        async with self.engine.begin() as conn:
-            query = delete(requests).where(requests.c.user_id == user_id)
-            await conn.execute(query)
-
-    async def get_requests(self, user_id: int) -> RequestPayload:
-        async with self.engine.begin() as conn:
-            query = select(
-                requests.c.target_user_switch_fc,
-                requests.c.target_user_name,
-                requests.c.target_user_nsa_id,
-            ).where(requests.c.user_id == user_id)
-
-            result = await conn.execute(query)
-            records = result.fetchall()
-
-        return [
-            {
-                "fc": fc,
-                "name": name,
-                "nsa_id": nsa_id,
-            }
-            for (fc, name, nsa_id) in records
-        ]
 
     # ResultRepository implementation
     async def create_result(
@@ -411,33 +323,6 @@ class Repository(IRepository):
             }
             for (id, played_at, score, enemy_name, enemy_score) in data
         ]
-
-    # SessionTokenRepository implementation
-    async def put_session_token(self, user_id: int, session_token: str) -> None:
-        async with self.engine.connect() as conn:
-            async with conn.begin() as tx:
-                try:
-                    query = (
-                        insert(session_tokens)
-                        .values(user_id=user_id, token=session_token)
-                        .on_duplicate_key_update(token=session_token)
-                    )
-                    await conn.execute(query)
-                    await tx.commit()
-                except:
-                    await tx.rollback()
-
-    async def get_session_token(self, user_id: int) -> str | None:
-        async with self.engine.begin() as conn:
-            query = select(session_tokens.c.token).where(session_tokens.c.user_id == user_id)
-            result = await conn.execute(query)
-            data = result.fetchone()
-
-        if data is None:
-            return None
-
-        (session_token,) = data
-        return session_token
 
     # UserRepository implementation
     async def put_lounge_id(self, user_id: int, lounge_id: int) -> None:

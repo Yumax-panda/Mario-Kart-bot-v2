@@ -12,7 +12,6 @@ __all__ = (
     "get_hours",
     "get_friend_codes",
     "get_datetime",
-    "maybe_param",
 )
 
 if TYPE_CHECKING:
@@ -22,17 +21,6 @@ if TYPE_CHECKING:
         month: int
         day: int
         hour: int
-
-    class DiscordIdParam(TypedDict):
-        discord_id: int
-
-    class FriendCodeParam(TypedDict):
-        fc: str
-
-    class PlayerNameParam(TypedDict):
-        name: str
-
-    MaybeParam = DiscordIdParam | FriendCodeParam | PlayerNameParam
 
 
 _NATURAL_NUMBER_RE = re.compile(r"\d+")
@@ -175,30 +163,3 @@ def get_datetime(text: str, locale: str | None) -> datetime | None:
         return None
 
     return datetime(**options)
-
-
-# TODO: test
-def maybe_param(text: str) -> MaybeParam:
-    """テキストからユーザー情報を識別するためのパラメータを取得する.
-    主にAPIにリクエストするときに指定する`params`に使用する.
-
-    フレンドコード, Discord IDのいずれでもない場合はプレイヤー名として扱う.
-
-    Parameters
-    ----------
-    text : str
-        パラメータを取得するテキスト.
-
-    Returns
-    -------
-    MaybeParam
-        パラメータ.
-    """
-
-    if friend_codes := get_friend_codes(text):
-        return {"fc": friend_codes[0]}
-
-    if discord_ids := parse_natural_numbers(text):
-        return {"discord_id": discord_ids[0]}
-
-    return {"name": text}

@@ -4,15 +4,12 @@ from io import BytesIO
 from typing import TYPE_CHECKING
 
 from discord import Embed, File
-from discord.ui import Modal as _Modal, View as _View
+from discord.ui import View as _View
 
 from utils.constants import EmbedColor
 from utils.errors import BotError, get_error_message
 
-__all__ = (
-    "View",
-    "Modal",
-)
+__all__ = ("View",)
 
 if TYPE_CHECKING:
     from discord import Interaction
@@ -82,8 +79,3 @@ class View(_View, ErrorHandlingMixin):
 
     async def on_error(self, error: Exception, item: Item, interaction: Interaction) -> None:
         await self.handle_error(error, interaction=interaction, item=item)
-
-
-class Modal(_Modal, ErrorHandlingMixin):
-    async def on_error(self, error: Exception, interaction: Interaction) -> None:
-        await self.handle_error(error, interaction=interaction)
