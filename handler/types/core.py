@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from mk8dx.lounge.types.client import LoungeClient as ILoungeClient
     from repository.config import Config
     from repository.types.repository import Repository as IRepository
-    from service.types.services import Service as IService
     from utils.constants import Season
 
 
@@ -27,7 +26,6 @@ class BaseHandler(metaclass=ABCMeta):
         config: Config
         lc: ILoungeClient
         repo: IRepository
-        srv: IService
         session: ClientSession
         _webhook_token: str
 

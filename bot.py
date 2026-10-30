@@ -12,7 +12,6 @@ from discord.ext import commands
 from handler import Handler
 from mk8dx import LoungeClient
 from repository import Config
-from service import Service
 from ui.bookmark import BookmarkView
 
 fmt = "%(asctime)s:%(levelname)s:%(name)s: %(message)s"
@@ -136,14 +135,12 @@ class Container(containers.DeclarativeContainer):
         db_name=config.db_name,
         ssl_ca_path=config.ssl_ca_path,
     )
-    srv = providers.Singleton(Service)
 
     h = providers.Singleton(
         Handler,
         webhook_token=config.webhook_url,
         lc=lc,
         config=cfg,
-        srv=srv,
     )
 
     bot = providers.Factory(

@@ -19,7 +19,6 @@ __all__ = ("Handler",)
 if TYPE_CHECKING:
     from mk8dx.lounge.types.client import LoungeClient as ILoungeClient
     from repository.types.repository import Repository as IRepository
-    from service.types.services import Service as IService
 
 
 class Handler(
@@ -38,5 +37,4 @@ class Handler(
         webhook_token: str,
         lc: ILoungeClient,
         repo: IRepository,
-        srv: IService,
     ) -> None: ...
