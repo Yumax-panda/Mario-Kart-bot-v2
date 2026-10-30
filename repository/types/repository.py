@@ -1,13 +1,4 @@
-from . import (
-    GatherRepository,
-    GuildRepository,
-    NSOTokenRepository,
-    PinnedPlayerRepository,
-    RequestRepository,
-    ResultRepository,
-    SessionTokenRepository,
-    UserRepository,
-)
+from . import GatherRepository, GuildRepository, PinnedPlayerRepository, ResultRepository, UserRepository
 
 __all__ = ("Repository",)
 
@@ -15,11 +6,8 @@ __all__ = ("Repository",)
 class Repository(
     GatherRepository,
     GuildRepository,
-    NSOTokenRepository,
     PinnedPlayerRepository,
-    RequestRepository,
     ResultRepository,
-    SessionTokenRepository,
     UserRepository,
 ):
     pass
