@@ -3,10 +3,7 @@ from utils.errors import BotError
 __all__ = (
     "FailedToGetUserData",
     "InvalidMessage",
-    "InvalidAuthURI",
-    "InvalidTextInput",
     "MessageNotFound",
-    "NintendoSwitchAccountIDNotFound",
     "PlayerNotFound",
     "PlayerNotSelected",
 )
@@ -17,10 +14,6 @@ class UIError(BotError):
 
 
 class ViewError(UIError):
-    pass
-
-
-class ModalError(UIError):
     pass
 
 
@@ -36,27 +29,6 @@ InvalidMessage = ViewError(
     {
         "ja": "無効なメッセージです.",
         "en-US": "Invalid message.",
-    },
-)
-
-InvalidTextInput = ModalError(
-    {
-        "ja": "無効な入力です.",
-        "en-US": "Invalid input.",
-    },
-)
-
-InvalidAuthURI = ModalError(
-    {
-        "ja": "無効な認証URLです.",
-        "en-US": "Invalid auth URI.",
-    },
-)
-
-NintendoSwitchAccountIDNotFound = ViewError(
-    {
-        "ja": "Nintendo Switch AccountのIDを取得できませんでした.",
-        "en-US": "Failed to get Nintendo Switch Account ID.",
     },
 )
 
