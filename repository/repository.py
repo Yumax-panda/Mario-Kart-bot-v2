@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
 from typing import TYPE_CHECKING, Iterable, TypeVar
 
-from sqlalchemy import and_, delete, desc, select
+from alembic import command
+from alembic.config import Config as AlembicConfig
+from sqlalchemy import and_, delete, desc, inspect, select
 from sqlalchemy.dialects.mysql import insert
 
 from model.gathers import gathers
@@ -17,6 +20,7 @@ from .types.repository import Repository as IRepository
 __all__ = ("Repository",)
 
 if TYPE_CHECKING:
+    from sqlalchemy.engine import Connection
     from sqlalchemy.ext.asyncio import AsyncEngine
 
     from model.gathers import GatherItem, ParticipationType
@@ -24,6 +28,26 @@ if TYPE_CHECKING:
 
 
 RepoT = TypeVar("RepoT", bound="Repository")
+
+_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _alembic_config(connection: Connection) -> AlembicConfig:
+    """既存の接続を使うalembicの設定を作成する."""
+    cfg = AlembicConfig(str(_ROOT / "alembic.ini"))
+    cfg.set_main_option("script_location", str(_ROOT / "migrations"))
+    cfg.attributes["connection"] = connection
+    return cfg
+
+
+def _has_version_table(connection: Connection) -> bool:
+    """マイグレーション履歴のテーブルが存在するか確認する."""
+    return inspect(connection).has_table("alembic_version")
+
+
+def _run_upgrade(connection: Connection) -> None:
+    """未適用のマイグレーションを全て適用する."""
+    command.upgrade(_alembic_config(connection), "head")
 
 
 class Repository(IRepository):
@@ -33,6 +57,19 @@ class Repository(IRepository):
 
     def __init__(self, engine: AsyncEngine) -> None:
         self.engine = engine
+
+    async def migrate(self) -> bool:
+        """未適用のマイグレーションを全て適用する.
+
+        Returns
+        -------
+        bool
+            マイグレーション履歴が存在せず, 新規に初期化された場合True.
+        """
+        async with self.engine.begin() as conn:
+            is_fresh = not await conn.run_sync(_has_version_table)
+            await conn.run_sync(_run_upgrade)
+            return is_fresh
 
     # GatherRepository implementation
     async def insert_gathers(

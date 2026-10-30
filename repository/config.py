@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import logging
 import ssl
 from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from model.core import metadata
-
 from .repository import Repository
 
 __all__ = ("Config",)
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncEngine
 
 
 class Config:
@@ -36,23 +38,24 @@ class Config:
     def dsn(self) -> str:
         return f"mysql+aiomysql://{self.user}:{self.password}@{self.host_name}:{self.port}/{self.db_name}"
 
-    async def get_repository(self) -> Repository:
+    def create_engine(self, *, echo: bool = True) -> AsyncEngine:
+        """接続設定からエンジンを作成する."""
+        connect_args = {}
+
         if self.ssl_ca_path:
-            ssl_context = ssl.create_default_context(cafile=self.ssl_ca_path)
-            engine = create_async_engine(
-                self.dsn,
-                echo=True,
-                pool_pre_ping=True,
-                connect_args={"ssl": ssl_context},
-            )
-        else:
-            engine = create_async_engine(
-                self.dsn,
-                echo=True,
-                pool_pre_ping=True,
-            )
+            connect_args["ssl"] = ssl.create_default_context(cafile=self.ssl_ca_path)
 
-        async with engine.begin() as conn:
-            await conn.run_sync(metadata.create_all)
+        return create_async_engine(
+            self.dsn,
+            echo=echo,
+            pool_pre_ping=True,
+            connect_args=connect_args,
+        )
 
-        return Repository(engine)
+    async def get_repository(self) -> Repository:
+        repo = Repository(self.create_engine())
+
+        if await repo.migrate():
+            logging.info("Database schema was freshly initialized.")
+
+        return repo
