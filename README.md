@@ -11,7 +11,6 @@
 - プレイヤーの一括検索
 - 交流戦の挙手
 - 戦績管理
-- フレンド申請
 
 MK8DX 150cc Loungeのデータは[MK8DX 150cc Leaderboard](https://www.mk8dx-lounge.com/Leaderboard)より取得しています。
 
